@@ -20,7 +20,7 @@
 CONFIG_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 CONFIG="${CONFIG_DIR}/config.cfg"
 
-${CONFIG_DIR}/led.py 100
+${CONFIG_DIR}/led.py ${LED_STARTUP}
 
 source "$CONFIG"
 
@@ -35,6 +35,8 @@ if [ $DISP = true ]; then
     oled +b "Insert storage"
     sudo oled s 
 fi
+
+#sudo shutdown -c
 
 # Wait for a USB storage device (e.g., a USB flash drive)
 STORAGE=$(ls /dev/* | grep "$STORAGE_DEV" | cut -d"/" -f3)
@@ -58,7 +60,7 @@ if [ $DISP = true ]; then
     sudo oled s 
 fi
 
-${CONFIG_DIR}/led.py 011
+${CONFIG_DIR}/led.py ${LED_STORAGE_MOUNTED}
 
 
 # Wait for a card reader or a camera
@@ -76,7 +78,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # Set the ACT LED to blink at 500ms to indicate that the card has been mounted
   sudo sh -c "echo 500 > /sys/class/leds/led0/delay_on"
-  ${CONFIG_DIR}/blink.py 001 &
+  ${CONFIG_DIR}/blink.py ${LED_COPYING} &
 
   # Cancel shutdown
   sudo shutdown -c
@@ -114,7 +116,7 @@ if [ $DISP = true ]; then
 fi
 
 sudo pkill -f blink.py
-${CONFIG_DIR}/led.py 010
+${CONFIG_DIR}/led.py ${LED_DONE}
 
 
 # Shutdown
