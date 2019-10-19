@@ -20,9 +20,11 @@
 CONFIG_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 CONFIG="${CONFIG_DIR}/config.cfg"
 
-${CONFIG_DIR}/led.py ${LED_STARTUP}
-
 source "$CONFIG"
+
+if [ $LED = true ]; then
+  ${CONFIG_DIR}/led.py ${LED_STARTUP}
+fi
 
 # Set the ACT LED to heartbeat
 sudo sh -c "echo heartbeat > /sys/class/leds/led0/trigger"
@@ -60,8 +62,9 @@ if [ $DISP = true ]; then
     sudo oled s 
 fi
 
-${CONFIG_DIR}/led.py ${LED_STORAGE_MOUNTED}
-
+if [ $LED = true ]; then
+  ${CONFIG_DIR}/led.py ${LED_STORAGE_MOUNTED}
+fi
 
 # Wait for a card reader or a camera
 # takes first device found
@@ -78,7 +81,9 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # Set the ACT LED to blink at 500ms to indicate that the card has been mounted
   sudo sh -c "echo 500 > /sys/class/leds/led0/delay_on"
-  ${CONFIG_DIR}/blink.py ${LED_COPYING} &
+  if [ $LED = true ]; then
+    ${CONFIG_DIR}/blink.py ${LED_COPYING} &
+  fi
 
   # Cancel shutdown
   sudo shutdown -c
@@ -115,9 +120,10 @@ if [ $DISP = true ]; then
     sudo oled s 
 fi
 
-sudo pkill -f blink.py
-${CONFIG_DIR}/led.py ${LED_DONE}
-
+if [ $LED = true ]; then
+  sudo pkill -f blink.py
+  ${CONFIG_DIR}/led.py ${LED_DONE}
+fi
 
 # Shutdown
 sync
