@@ -54,8 +54,13 @@ do
     if [ $DISP = true ]; then
         NOW=`date +%s`
         DIFFSEC=`expr ${END} - ${NOW}`
+        DIFFMIN=`date +%-M -ud @${DIFFSEC}`
+        DURATION="`date +%-S -ud @${DIFFSEC}`s"
+        if [[ "${DIFFMIN}" != "0" ]]; then
+          DURATION="${DIFFMIN}min ${DURATION}"
+        fi
 
-        oled +b "in `date +%-M -ud @${DIFFSEC}`min `date +%-S -ud @${DIFFSEC}`s"
+        oled +b "in ${DURATION}"
         sudo oled s
     fi
 
