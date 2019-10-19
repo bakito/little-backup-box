@@ -31,20 +31,27 @@ sudo sh -c "echo heartbeat > /sys/class/leds/led0/trigger"
 
 # Shutdown after a specified period of time (in minutes) if no device is connected.
 sudo shutdown -h $SHUTD "Shutdown is activated. To cancel: sudo shutdown -c"
-if [ $DISP = true ]; then
-    oled r
-    oled +a "Shutdown active"
-    oled +b "in ${SHUTD} min"
-    oled +c "Insert storage"
-    sudo oled s
-fi
-
+END=`date --date="+$SHUTD minutes" +"%s"`
 #sudo shutdown -c
 
 # Wait for a USB storage device (e.g., a USB flash drive)
 STORAGE=$(ls /dev/* | grep "$STORAGE_DEV" | cut -d"/" -f3)
+if [ $DISP = true ]; then
+    oled r
+    oled +a "Shutdown active"
+    oled +c "Insert storage"
+fi
+
 while [ -z "${STORAGE}" ]
 do
+    if [ $DISP = true ]; then
+        NOW=`date +%s`
+        DIFFSEC=`expr ${END} - ${NOW}`
+
+        oled +b "in `date +%-M -ud @${DIFFSEC}`min `date +%-S -ud @${DIFFSEC}`s"
+        sudo oled s
+    fi
+
     sleep 1
     STORAGE=$(ls /dev/* | grep "$STORAGE_DEV" | cut -d"/" -f3)
 done
@@ -60,7 +67,7 @@ if [ $DISP = true ]; then
     oled r
     oled +a "Storage OK"
     oled +b "Card reader..."
-    sudo oled s 
+    sudo oled s
 fi
 
 if [ $LED = true ]; then
@@ -94,7 +101,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
       oled r
       oled +a "Card reader OK"
       oled +b "Working..."
-      sudo oled s 
+      sudo oled s
   fi
 
   # Create  a .id random identifier file if doesn't exist
@@ -119,8 +126,6 @@ if [ $DISP = true ]; then
     oled +a "Backup complete"
     sudo oled s
 
-    sleep 2
-
     # If display support is enabled, display storage space info
     storsize=$(df /dev/"$STORAGE_DEV"  -h --output=size | sed '1d')
     storused=$(df /dev/"$STORAGE_DEV"  -h --output=pcent | sed '1d')
@@ -132,11 +137,12 @@ if [ $DISP = true ]; then
     oled +d " Free: $storfree"
     sudo oled s
 
-    sleep 2
+    sleep 3
 
     oled r
     oled +a "Shutting down"
     sudo oled s
+    sleep 2
 fi
 
 
@@ -153,7 +159,7 @@ if [ $DISP = true ]; then
     oled r
 fi
 
-shutdown -h now &
+shutdown -h now
 
 if [ $DISP = true ]; then
   oled r
