@@ -34,8 +34,9 @@ sudo shutdown -h $SHUTD "Shutdown is activated. To cancel: sudo shutdown -c"
 if [ $DISP = true ]; then
     oled r
     oled +a "Shutdown active"
-    oled +b "Insert storage"
-    sudo oled s 
+    oled +b "in ${SHUTD} min"
+    oled +c "Insert storage"
+    sudo oled s
 fi
 
 #sudo shutdown -c
@@ -87,7 +88,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # Cancel shutdown
   sudo shutdown -c
-  
+
   # If display support is enabled, notify that the card has been mounted
   if [ $DISP = true ]; then
       oled r
@@ -116,9 +117,30 @@ fi
 if [ $DISP = true ]; then
     oled r
     oled +a "Backup complete"
-    oled +b "Shutdown"
-    sudo oled s 
+    sudo oled s
+
+    sleep 2
+
+    # If display support is enabled, display storage space info
+    storsize=$(df /dev/"$STORAGE_DEV"  -h --output=size | sed '1d')
+    storused=$(df /dev/"$STORAGE_DEV"  -h --output=pcent | sed '1d')
+    storfree=$(df /dev/"$STORAGE_DEV"  -h --output=avail | sed '1d')
+    oled r
+    oled +a "Avail. storage"
+    oled +b "Total: $storsize"
+    oled +c " Used: $storused"
+    oled +d " Free: $storfree"
+    sudo oled s
+
+    sleep 2
+
+    oled r
+    oled +a "Shutting down"
+    sudo oled s
 fi
+
+
+
 
 if [ $LED = true ]; then
   sudo pkill -f blink.py
@@ -130,4 +152,10 @@ sync
 if [ $DISP = true ]; then
     oled r
 fi
-shutdown -h now
+
+shutdown -h now &
+
+if [ $DISP = true ]; then
+  oled r
+  sudo oled s
+fi
