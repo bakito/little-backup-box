@@ -17,8 +17,10 @@
 # Run the install-little-backup-box.sh script first
 # to install the required packages and configure the system.
 
-CONFIG_DIR=$(dirname "$0")
+CONFIG_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 CONFIG="${CONFIG_DIR}/config.cfg"
+
+${CONFIG_DIR}/led.py 100
 
 source "$CONFIG"
 
@@ -33,7 +35,7 @@ if [ $DISP = true ]; then
     oled +b "Insert storage"
     sudo oled s 
 fi
-
+sudo shutdown -c
 # Wait for a USB storage device (e.g., a USB flash drive)
 STORAGE=$(ls /dev/* | grep "$STORAGE_DEV" | cut -d"/" -f3)
 while [ -z "${STORAGE}" ]
@@ -56,6 +58,9 @@ if [ $DISP = true ]; then
     sudo oled s 
 fi
 
+${CONFIG_DIR}/led.py 011
+
+
 # Wait for a card reader or a camera
 # takes first device found
 CARD_READER=($(ls /dev/* | grep "$CARD_DEV" | cut -d"/" -f3))
@@ -71,6 +76,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # Set the ACT LED to blink at 500ms to indicate that the card has been mounted
   sudo sh -c "echo 500 > /sys/class/leds/led0/delay_on"
+  ${CONFIG_DIR}/led.py 001
 
   # Cancel shutdown
   sudo shutdown -c
@@ -106,9 +112,13 @@ if [ $DISP = true ]; then
     oled +b "Shutdown"
     sudo oled s 
 fi
+
+${CONFIG_DIR}/led.py 010
+
+
 # Shutdown
 sync
 if [ $DISP = true ]; then
     oled r
 fi
-shutdown -h now
+#shutdown -h now
