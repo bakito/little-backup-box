@@ -42,13 +42,15 @@ do
     if [ $DISP = true ]; then
         NOW=`date +%s`
         DIFFSEC=`expr ${END} - ${NOW}`
-        DIFFMIN=`date +%-M -ud @${DIFFSEC}`
-        DURATION="`date +%-S -ud @${DIFFSEC}`s"
-        if [[ "${DIFFMIN}" != "0" ]]; then
-          DURATION="${DIFFMIN}min ${DURATION}"
-        fi
+        if [ "${DIFFSEC}" -ge "0" ];then
+          DIFFMIN=`date +%-M -ud @${DIFFSEC}`
+          DURATION="`date +%-S -ud @${DIFFSEC}`s"
+          if [[ "${DIFFMIN}" != "0" ]]; then
+            DURATION="${DIFFMIN}min ${DURATION}"
+          fi
 
-        /home/pi/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
+          /home/pi/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
+        fi
     fi
 
     sleep 1
