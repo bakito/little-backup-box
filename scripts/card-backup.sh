@@ -37,12 +37,6 @@ END=`date --date="+$SHUTD minutes" +"%s"`
 
 # Wait for a USB storage device (e.g., a USB flash drive)
 STORAGE=$(ls /dev/* | grep "$STORAGE_DEV" | cut -d"/" -f3)
-if [ $DISP = true ]; then
-    oled r
-    oled +a "Shutdown active"
-    oled +c "Insert storage"
-fi
-
 while [ -z "${STORAGE}" ]
 do
     if [ $DISP = true ]; then
@@ -54,8 +48,7 @@ do
           DURATION="${DIFFMIN}min ${DURATION}"
         fi
 
-        oled +b "in ${DURATION}"
-        sudo oled s
+        /home/pi/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
     fi
 
     sleep 1
@@ -70,10 +63,7 @@ sudo sh -c "echo 1000 > /sys/class/leds/led0/delay_on"
 
 # If display support is enabled, notify that the storage device has been mounted
 if [ $DISP = true ]; then
-    oled r
-    oled +a "Storage OK"
-    oled +b "Card reader..."
-    sudo oled s
+    /home/pi/rpi-oled/card-backup-storage-ok.py
 fi
 
 if [ $LED = true ]; then
@@ -104,10 +94,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # If display support is enabled, notify that the card has been mounted
   if [ $DISP = true ]; then
-      oled r
-      oled +a "Card reader OK"
-      oled +b "Working..."
-      sudo oled s
+    /home/pi/rpi-oled/card-backup-cardreader-ok.py
   fi
 
   # Create  a .id random identifier file if doesn't exist
@@ -128,26 +115,18 @@ fi
 
 # If display support is enabled, notify that the backup is complete
 if [ $DISP = true ]; then
-    oled r
-    oled +a "Backup complete"
-    sudo oled s
+    /home/pi/rpi-oled/card-backup-complete.py
 
     # If display support is enabled, display storage space info
     storsize=$(df /dev/"$STORAGE_DEV"  -h --output=size | sed '1d')
     storused=$(df /dev/"$STORAGE_DEV"  -h --output=pcent | sed '1d')
     storfree=$(df /dev/"$STORAGE_DEV"  -h --output=avail | sed '1d')
-    oled r
-    oled +a "Avail. storage"
-    oled +b "Total: $storsize"
-    oled +c " Used: $storused"
-    oled +d " Free: $storfree"
-    sudo oled s
+
+    /home/pi/rpi-oled/card-backup-disk-usage.py "$storsize" "$storused" "$storfree"
 
     sleep 3
 
-    oled r
-    oled +a "Shutting down"
-    sudo oled s
+    /home/pi/rpi-oled/card-backup-shutdown.py
     sleep 2
 fi
 
@@ -161,9 +140,6 @@ fi
 
 # Shutdown
 sync
-if [ $DISP = true ]; then
-    oled r
-fi
 
 shutdown -h now
 

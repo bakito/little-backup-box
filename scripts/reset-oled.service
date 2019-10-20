@@ -4,8 +4,8 @@ Description=resetOled
 [Service]
 Type=oneshot
 RemainAfterExit=true
-ExecStart=/home/pi/little-backup-box/scripts/init-oled.sh
-ExecStop=//home/pi/little-backup-box/scripts/reset-oled.sh
+ExecStart=/home/pi/rpi-oled/splash.py
+ExecStop=/home/pi/little-backup-box/scripts/reset-oled.sh
 
 [Install]
 WantedBy=multi-user.target
