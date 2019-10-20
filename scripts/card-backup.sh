@@ -33,6 +33,7 @@ sudo sh -c "echo heartbeat > /sys/class/leds/led0/trigger"
 # Shutdown after a specified period of time (in minutes) if no device is connected.
 sudo shutdown -h $SHUTD "Shutdown is activated. To cancel: sudo shutdown -c"
 END=`date --date="+$SHUTD minutes" +"%s"`
+IS_SHUTDOWN=false
 #sudo shutdown -c
 
 # Wait for a USB storage device (e.g., a USB flash drive)
@@ -51,7 +52,10 @@ do
 
           /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
         else
-          /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown.py
+          if [ $IS_SHUTDOWN = false ]; then
+            /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown.py
+            IS_SHUTDOWN=true
+          fi
         fi
     fi
 
@@ -121,12 +125,7 @@ fi
 if [ $DISP = true ]; then
     /home/pi/little-backup-box/scripts/rpi-oled/card-backup-complete.py
 
-    # If display support is enabled, display storage space info
-    storsize=$(df /dev/"$STORAGE_DEV"  -h --output=size | sed '1d')
-    storused=$(df /dev/"$STORAGE_DEV"  -h --output=pcent | sed '1d')
-    storfree=$(df /dev/"$STORAGE_DEV"  -h --output=avail | sed '1d')
-
-    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-disk-usage.py "$storsize" "$storused" "$storfree"
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-disk-usage.py "$STORAGE_MOUNT_POINT"
 
     sleep 3
 
