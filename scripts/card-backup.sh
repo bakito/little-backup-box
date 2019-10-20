@@ -18,12 +18,6 @@
 # to install the required packages and configure the system.
 
 
-if [ -f /home/pi/lib_oled96/logo.py ]; then
-    /home/pi/lib_oled96/logo.py
-
-    sleep 3
-fi
-
 CONFIG_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
 CONFIG="${CONFIG_DIR}/config.cfg"
 
@@ -173,7 +167,3 @@ fi
 
 shutdown -h now
 
-if [ $DISP = true ]; then
-  oled r
-  sudo oled s
-fi
