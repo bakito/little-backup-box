@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #!python
 
+import humanize
+import psutil
 import time
 
 import Adafruit_GPIO.SPI as SPI
@@ -72,14 +74,16 @@ draw.rectangle((0,0,width,height), outline=0, fill=0)
 # Icon
 draw.text((x, top+5), unichr(61600),  font=fa_solid_20, fill=255)
 
+du = psutil.disk_usage(sys.argv[1])
+
 # Text
 draw.text((30, top+5),    "Avail. storage",  font=font_text, fill=255)
 draw.text((30, top+20),    "Total:",  font=font_text, fill=255)
-draw.text((70, top+20),    sys.argv[1],  font=font_text, fill=255)
+draw.text((70, top+20),    humanize.naturalsize(du.total),  font=font_text, fill=255)
 draw.text((30, top+35),    "Used: ",  font=font_text, fill=255)
-draw.text((70, top+35),    sys.argv[2],  font=font_text, fill=255)
+draw.text((70, top+35),    "{}%".format(du.percent),  font=font_text, fill=255)
 draw.text((30, top+50),    "Free: ",  font=font_text, fill=255)
-draw.text((70, top+50),    sys.argv[3],  font=font_text, fill=255)
+draw.text((70, top+50),    humanize.naturalsize(du.free),  font=font_text, fill=255)
 
 # Display image.
 disp.image(image)
