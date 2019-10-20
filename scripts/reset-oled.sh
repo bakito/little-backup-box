@@ -1,7 +1,5 @@
 #!/bin/bash
 
 sudo pkill -f card-backup.sh
-
-oled r
-oled s
+/home/pi/little-backup-box/scripts/rpi-oled/reset.py
 

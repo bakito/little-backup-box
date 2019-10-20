@@ -49,7 +49,9 @@ do
             DURATION="${DIFFMIN}min ${DURATION}"
           fi
 
-          /home/pi/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
+          /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown-active.py "in ${DURATION}"
+        else
+          /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown.py
         fi
     fi
 
@@ -65,7 +67,7 @@ sudo sh -c "echo 1000 > /sys/class/leds/led0/delay_on"
 
 # If display support is enabled, notify that the storage device has been mounted
 if [ $DISP = true ]; then
-    /home/pi/rpi-oled/card-backup-storage-ok.py
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-storage-ok.py
 fi
 
 if [ $LED = true ]; then
@@ -96,7 +98,7 @@ if [ ! -z "${CARD_READER[0]}" ]; then
 
   # If display support is enabled, notify that the card has been mounted
   if [ $DISP = true ]; then
-    /home/pi/rpi-oled/card-backup-cardreader-ok.py
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-cardreader-ok.py
   fi
 
   # Create  a .id random identifier file if doesn't exist
@@ -117,18 +119,18 @@ fi
 
 # If display support is enabled, notify that the backup is complete
 if [ $DISP = true ]; then
-    /home/pi/rpi-oled/card-backup-complete.py
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-complete.py
 
     # If display support is enabled, display storage space info
     storsize=$(df /dev/"$STORAGE_DEV"  -h --output=size | sed '1d')
     storused=$(df /dev/"$STORAGE_DEV"  -h --output=pcent | sed '1d')
     storfree=$(df /dev/"$STORAGE_DEV"  -h --output=avail | sed '1d')
 
-    /home/pi/rpi-oled/card-backup-disk-usage.py "$storsize" "$storused" "$storfree"
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-disk-usage.py "$storsize" "$storused" "$storfree"
 
     sleep 3
 
-    /home/pi/rpi-oled/card-backup-shutdown.py
+    /home/pi/little-backup-box/scripts/rpi-oled/card-backup-shutdown.py
     sleep 2
 fi
 
